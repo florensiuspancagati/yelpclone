@@ -1,0 +1,13 @@
+{
+    "emmet.includeLanguages": {
+        "ejs": "html"
+    },
+    "emmet.syntaxProfiles": {
+        "ejs": {
+            "profile": "html"
+        }
+    },
+    "emmet.variables": {
+        "ejsou": "<%= %>"
+    }
+}

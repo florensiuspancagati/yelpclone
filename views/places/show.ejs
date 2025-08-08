@@ -1,0 +1,117 @@
+<% layout('layouts/app') %>
+
+<link rel="stylesheet" href="/css/stars.css">
+<div class="row mb-5">
+    <div class="col-6">
+        <div class="card">
+            <!-- CAROUSEL -->
+            <div id="carouselExample" class="carousel slide">
+                <div class="carousel-inner">
+                    <% place.images.forEach((image, index) => { %>
+                    <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                        <img src="/images/<%= image.filename %>" class="d-block w-100" alt="<%= place.title %>">
+                    </div>
+                    <% }) %>
+                </div>
+                <% if(place.images.length > 1) { %>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Next</span>
+                </button>
+                <% } %>
+            </div>
+             <!-- CAROUSEL -->
+            <div class="card-body">
+                <h5 class="card-title"><%= place.title %></h5>
+                <p class="card-text"><%= place.description %></p>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><%= place.location %></li>
+                <li class="list-group-item">Author: <%= place.author.username %></li>
+                <li class="list-group-item"><%= place.price %></li>
+            </ul>
+                
+            <!-- Check if the current user is the author of the place -->
+            <% if(currentUser && place.author.equals(currentUser._id)) { %>
+            <div class="card-body">
+                <a href="/places/<%= place._id %>/edit" class="card-link btn btn-warning text-white">Edit</a>
+                <form action="/places/<%= place._id %>?_method=DELETE" method="post" style="display: inline!important;">
+                   <button class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+            <% }; %>
+        </div>
+    </div>
+
+    <div class="col-6">
+        <!-- map -->
+        <!-- <div style="width: 640px; height: 480px; margin-bottom: 5%;" id="my-map"></div> -->
+        <% if(currentUser) { %>
+        <h3>Leave a Review</h3>
+        <!-- // Review form -->
+        <form action="/places/<%= place._id %>/reviews" method="POST" class="validate-form mb-3" novalidate>
+            <div class="mb-3">
+                <label for="rating">Rating</label>
+                <fieldset class="starability-basic">
+                    <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
+                    <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                    <label for="first-rate1" title="Terrible">1 star</label>
+                    <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                    <label for="first-rate2" title="Not good">2 stars</label>
+                    <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                    <label for="first-rate3" title="Average">3 stars</label>
+                    <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                    <label for="first-rate4" title="Very good">4 stars</label>
+                    <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                    <label for="first-rate5" title="Amazing">5 stars</label>
+                </fieldset>
+            </div>
+            <div class="mb-3">
+                <label for="review">Review</label>
+                <textarea name="review[body]" id="body" cols="30" rows="5" class="form-control" required></textarea>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+                <div class="invalid-feedback">
+                    Please fill out this field!
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success">Submit</button>
+        </form>
+        <% } %>
+        <!-- // Display reviews -->
+        <% for(const review of place.reviews) { %>
+            <div class="card mb-3">
+                <div class="card-body">
+                    <p class="starability-result" data-rating="<%= review.rating %>">
+                      Rated: <%= review.rating %>
+                    </p>
+                    <p class="card-text"><%= review.body %></p>
+                    <!-- Check if the current user is the author of the review -->
+                    <% if(currentUser && review.author.equals(currentUser._id)) { %>
+                    <form action="/places/<%= place._id %>/reviews/<%= review._id %>?_method=DELETE" method="POST" style="display: inline!important;">
+                        <button class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                    <% } %>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<!-- <script>
+    const map = L.map('my-map').setView([48.1500327, 11.5753989], 10);
+    const isRetina = L.Browser.retina;
+    const baseUrl = "https://maps.geoapify.com/v1/tile/osm-bright/{z}/{x}/{y}.png?apiKey={apiKey}";
+    const retinaUrl = "https://maps.geoapify.com/v1/tile/osm-bright/{z}/{x}/{y}@2x.png?apiKey={apiKey}";
+    L.tileLayer(isRetina ? retinaUrl : baseUrl, {
+        attribution: 'Powered by <a href="https://www.geoapify.com/" target="_blank">Geoapify</a> | <a href="https://openmaptiles.org/" target="_blank">© OpenMapTiles</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">© OpenStreetMap</a> contributors',
+        apiKey: f187c03b16d743d7a894483831561c02, 
+        maxZoom: 20, 
+        id: 'osm-bright'
+    }).addTo(map);
+</script> -->
